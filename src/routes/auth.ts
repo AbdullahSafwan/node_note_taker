@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import { authValidator } from "../middleware/validator/authValidator";
 import authController from '../controllers/auth';
+import { throwValidationResult } from '../utils/helper';
 
 const router = Router();
 
@@ -8,14 +10,14 @@ const router = Router();
  * @desc    Register a new user
  * @access  Public
  */
-router.post('/signup', authController.signUp);
+router.post('/signup', authValidator.signUpValidator, throwValidationResult, authController.signUp);
 
 /**
  * @route   POST /auth/login
  * @desc    Login user
  * @access  Public
  */
-router.post('/login', authController.logIn);
+router.post('/login', authValidator.logInValidator, throwValidationResult, authController.logIn);
 
 /**
  * @route   POST /auth/refresh
