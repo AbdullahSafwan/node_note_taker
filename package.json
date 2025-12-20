@@ -4,12 +4,35 @@
   "description": "note taking app built using node.js, ts, express, redis, mysql",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx nodemon",
+    "build": "rimraf ./build && tsc",
+    "start": "node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com-personal:AbdullahSafwan/node_note_taker.git"
   },
   "author": "AbdullahSafwan",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.1",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "rimraf": "^6.1.2"
+  }
 }
