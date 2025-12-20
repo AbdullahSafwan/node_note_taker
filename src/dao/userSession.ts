@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "../../generated/prisma/client";
 import { debugLog } from "../utils/helper";
 
 const createSession = async (prisma: PrismaClient, userId: number, refreshToken: string) => {

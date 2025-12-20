@@ -1,34 +1,14 @@
-import { PrismaClient } from '../generated/prisma/client';
-import { PrismaPlanetScale } from '@prisma/adapter-planetscale';
-import { Client } from '@planetscale/database';
+import "dotenv/config";
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaClient } from "../../generated/prisma/client"
 
-let prismaInstance: PrismaClient | null = null;
+const adapter = new PrismaMariaDb({
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
+  connectionLimit: 5
+});
+const prisma = new PrismaClient({ adapter });
 
-
-export const getPrismaClient = (): PrismaClient => {
-  if (!prismaInstance) {
-    const client = new Client({
-      url: process.env.DATABASE_URL!,
-    });
-
-    const adapter = new PrismaPlanetScale(client);
-
-    // init prisma clinet
-    prismaInstance = new PrismaClient({
-      adapter,
-      log: process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
-    });
-  }
-  return prismaInstance;
-};
-
-export const disconnectPrisma = async (): Promise<void> => {
-  if (prismaInstance) {
-    await prismaInstance.$disconnect();
-  }
-};
-
-// Export singleton instance
-export const prisma = getPrismaClient();
+export { prisma }

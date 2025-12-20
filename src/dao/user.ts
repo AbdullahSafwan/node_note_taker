@@ -1,5 +1,4 @@
-import { Prisma } from "../generated/prisma";
-import { PrismaClient } from "../generated/prisma";
+import { Prisma, PrismaClient } from "../../generated/prisma/client";
 import { debugLog } from "../utils/helper";
 
 const createUser = async (prisma: PrismaClient, data: Prisma.userCreateInput) => {
@@ -7,7 +6,12 @@ const createUser = async (prisma: PrismaClient, data: Prisma.userCreateInput) =>
     const result = await prisma.user.create({
       data,
       select: {
-        password: false
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        modifiedAt: true,
       }
     });
     return result;
