@@ -248,6 +248,37 @@ const revertToVersion = async (req: Request<{ id: string }, unknown, RevertNoteR
   }
 };
 
+const serachOldVersions = async (
+  req: Request<Record<string, never>, unknown, unknown, { q: string; page?: string; limit?: string }>,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      sendErrorResponse(res, 401, "Unauthorized");
+      return;
+    }
+
+    const { q: searchQuery } = req.query;
+    const page = parseInt(req.query.page || "1", 10);
+    const limit = parseInt(req.query.limit || "20", 10);
+
+    const { versions, pagination } = await notesService.searchVersions(userId, searchQuery, page, limit);
+
+    sendSuccessResponse(res, 200, "Version search results retrieved successfully", versions, {
+      total: pagination.total,
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: pagination.totalPages,
+      searchQuery: pagination.searchQuery,
+    });
+  } catch (error) {
+    debugLog("Error in searchVersions controller:", error);
+    sendErrorResponse(res, 500, "Failed to search versions", error);
+  }
+};
+
 const notesController = {
   createNote,
   getNoteById,
@@ -257,6 +288,7 @@ const notesController = {
   deleteNote,
   getVersionHistory,
   revertToVersion,
+  serachOldVersions,
 };
 
 export default notesController;

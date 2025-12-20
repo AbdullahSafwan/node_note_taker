@@ -12,6 +12,7 @@ import {
   listNotesValidation,
   getVersionHistoryValidation,
   revertToVersionValidation,
+  searchNotesVersionsValidator,
 } from "../middleware/validator/notesValidator";
 
 const router = Router();
@@ -23,6 +24,8 @@ router.post("/", createNoteValidation, throwValidationResult, notesController.cr
 router.get("/", listNotesValidation, throwValidationResult, notesController.getAllNotes);
 
 router.get("/search", searchNotesValidation, throwValidationResult, notesController.searchNotes);
+
+router.get("/search-versions", searchNotesVersionsValidator, throwValidationResult, notesController.serachOldVersions);
 
 router.get("/:id", getNoteByIdValidation, throwValidationResult, notesController.getNoteById);
 
