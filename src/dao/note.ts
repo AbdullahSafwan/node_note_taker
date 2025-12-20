@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from "../../generated/prisma/client";
 import { CreateNoteData, UpdateNoteData } from "../types/notesTypes";
+import { debugLog } from "../utils/helper";
 
 const createNote = async (prisma: PrismaClient | Prisma.TransactionClient, data: CreateNoteData) => {
   try {
@@ -11,7 +12,7 @@ const createNote = async (prisma: PrismaClient | Prisma.TransactionClient, data:
       },
     });
   } catch (error) {
-    console.error("Error creating note:", error);
+    debugLog("Error creating note:", error);
     throw error;
   }
 };
@@ -26,7 +27,7 @@ const findNoteById = async (prisma: PrismaClient | Prisma.TransactionClient, not
       },
     });
   } catch (error) {
-    console.error("Error finding note by ID:", error);
+    debugLog("Error finding note by ID:", error);
     throw error;
   }
 };
@@ -55,7 +56,7 @@ const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClien
 
     return { notes, total };
   } catch (error) {
-    console.error("Error finding notes by user:", error);
+    debugLog("Error finding notes by user:", error);
     throw error;
   }
 };
@@ -114,7 +115,7 @@ const searchNotes = async (
 
     return { notes, total };
   } catch (error) {
-    console.error("Error searching notes:", error);
+    debugLog("Error searching notes:", error);
     throw error;
   }
 };
@@ -145,7 +146,7 @@ const updateNote = async (
 
     return updateResult;
   } catch (error) {
-    console.error("Error updating note:", error);
+    debugLog("Error updating note:", error);
     throw error;
   }
 };
@@ -164,7 +165,7 @@ const softDeleteNote = async (prisma: PrismaClient | Prisma.TransactionClient, n
       },
     });
   } catch (error) {
-    console.error("Error soft deleting note:", error);
+    debugLog("Error soft deleting note:", error);
     throw error;
   }
 };
@@ -196,7 +197,7 @@ const revertNoteToVersion = async (
 
     return updateResult;
   } catch (error) {
-    console.error("Error reverting note to version:", error);
+    debugLog("Error reverting note to version:", error);
     throw error;
   }
 };

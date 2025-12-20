@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "../../generated/prisma/client";
 import { CreateNoteVersionData } from "../types/notesTypes";
+import { debugLog } from "../utils/helper";
 
 export const createNoteVersion = async (prisma: PrismaClient | Prisma.TransactionClient, data: CreateNoteVersionData) => {
   try {
@@ -14,7 +15,7 @@ export const createNoteVersion = async (prisma: PrismaClient | Prisma.Transactio
       },
     });
   } catch (error) {
-    console.error("Error creating note version:", error);
+    debugLog("Error creating note version:", error);
     throw error;
   }
 };
@@ -30,7 +31,7 @@ export const findVersionsByNoteId = async (prisma: PrismaClient | Prisma.Transac
       },
     });
   } catch (error) {
-    console.error("Error finding versions by note ID:", error);
+    debugLog("Error finding versions by note ID:", error);
     throw error;
   }
 };
@@ -44,7 +45,7 @@ export const findVersionByNumber = async (prisma: PrismaClient | Prisma.Transact
       },
     });
   } catch (error) {
-    console.error("Error finding version by number:", error);
+    debugLog("Error finding version by number:", error);
     throw error;
   }
 };

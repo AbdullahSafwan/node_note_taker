@@ -1,9 +1,10 @@
-import { CustomJwtPayload } from './authTypes';
+import { CustomJwtPayload } from "./authTypes";
 
 declare global {
   namespace Express {
     interface Request {
       user?: CustomJwtPayload;
+      etag?: number;
     }
   }
 }
