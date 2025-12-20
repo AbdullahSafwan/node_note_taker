@@ -34,12 +34,14 @@ const findNoteById = async (prisma: PrismaClient | Prisma.TransactionClient, not
 
 const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClient, userId: number, skip: number, limit: number) => {
   try {
+    const whereClause = {
+      userId,
+      isDeleted: false,
+    };
+
     const [notes, total] = await Promise.all([
       prisma.note.findMany({
-        where: {
-          userId,
-          isDeleted: false,
-        },
+        where: whereClause,
         select: {
           id: true,
           title: true,
@@ -55,10 +57,7 @@ const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClien
         take: limit,
       }),
       prisma.note.count({
-        where: {
-          userId,
-          isDeleted: false,
-        },
+        where: whereClause,
       }),
     ]);
 
@@ -77,24 +76,26 @@ const searchNotes = async (
   limit: number
 ) => {
   try {
+    const whereClause = {
+      userId,
+      isDeleted: false,
+      OR: [
+        {
+          title: {
+            contains: searchQuery,
+          },
+        },
+        {
+          content: {
+            contains: searchQuery,
+          },
+        },
+      ],
+    };
+
     const [notes, total] = await Promise.all([
       prisma.note.findMany({
-        where: {
-          userId,
-          isDeleted: false,
-          OR: [
-            {
-              title: {
-                contains: searchQuery,
-              },
-            },
-            {
-              content: {
-                contains: searchQuery,
-              },
-            },
-          ],
-        },
+        where: whereClause,
         select: {
           id: true,
           title: true,
@@ -110,22 +111,7 @@ const searchNotes = async (
         take: limit,
       }),
       prisma.note.count({
-        where: {
-          userId,
-          isDeleted: false,
-          OR: [
-            {
-              title: {
-                contains: searchQuery,
-              },
-            },
-            {
-              content: {
-                contains: searchQuery,
-              },
-            },
-          ],
-        },
+        where: whereClause,
       }),
     ]);
 
