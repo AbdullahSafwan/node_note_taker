@@ -1,0 +1,15 @@
+{
+  "name": "node_note_taker",
+  "version": "1.0.0",
+  "description": "note taking app built using node.js, ts, express, redis, mysql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-personal:AbdullahSafwan/node_note_taker.git"
+  },
+  "author": "AbdullahSafwan",
+  "license": "ISC"
+}
