@@ -32,7 +32,7 @@
     "typescript-eslint": "^8.50.0"
   },
   "dependencies": {
-    "@prisma/adapter-planetscale": "^7.2.0",
+    "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
