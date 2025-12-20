@@ -18,6 +18,7 @@ model user {
   modifiedAt                DateTime                  @default(now()) @updatedAt
   status                    user_status               @default(ENABLED)
   user_sessions             user_session[]
+  notes                     note[]
 }
 
 model user_session {
@@ -31,4 +32,39 @@ model user_session {
 enum user_status {
   ENABLED
   DISABLED
+}
+
+model note {
+  id        String         @id @default(uuid())
+  title     String         @db.VarChar(255)
+  content   String         @db.Text
+  version   Int            @default(1)
+  isDeleted Boolean        @default(false)
+  deletedAt DateTime?
+  userId    Int
+  user      user           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  versions  note_version[]
+
+  @@index([userId])
+  @@index([isDeleted])
+  @@index([userId, isDeleted])
+  @@fulltext([title, content])
+}
+
+model note_version {
+  id                String   @id @default(uuid())
+  noteId            String
+  title             String   @db.VarChar(255)
+  content           String   @db.Text
+  versionNumber     Int
+  createdAt         DateTime @default(now())
+  createdBy         Int
+  changeDescription String?  @db.VarChar(500)
+  note              note     @relation(fields: [noteId], references: [id], onDelete: Restrict)
+
+  @@index([noteId])
+  @@index([noteId, versionNumber])
+  @@index([createdAt])
 }

@@ -5,6 +5,13 @@ interface SuccessResponse<T = any> {
   data: T;
   message: string;
   error: null;
+  meta?: {
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    searchQuery?: string;
+  };
 }
 
 interface ErrorResponse {
@@ -21,13 +28,15 @@ export const sendSuccessResponse = <T = any>(
   res: Response,
   statusCode: number,
   message: string,
-  payload?: T
+  payload?: T,
+  meta?: SuccessResponse<T>['meta']
 ): Response<SuccessResponse<T>> => {
   return res.status(statusCode).json({
     success: true,
     data: payload || null,
     message,
     error: null,
+    ...(meta && { meta }),
   });
 };
 
