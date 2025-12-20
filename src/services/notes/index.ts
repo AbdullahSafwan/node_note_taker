@@ -162,6 +162,29 @@ export const getVersionHistory = async (noteId: string, userId: number) => {
   }
 };
 
+export const searchVersions = async (userId: number, searchQuery: string, page: number = 1, limit: number = 20) => {
+  try {
+    const skip = (page - 1) * limit;
+    const { versions, total } = await noteVersionDao.searchVersions(prisma, userId, searchQuery, skip, limit);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      versions,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        searchQuery,
+      },
+    };
+  } catch (error) {
+    debugLog("Error in searchVersions service:", error);
+    throw error;
+  }
+};
+
 export const revertToVersion = async (noteId: string, userId: number, expectedVersion: number, data: RevertNoteRequest) => {
   try {
     return await prisma.$transaction(async (tx) => {
@@ -223,6 +246,7 @@ const notesService = {
   getNoteById,
   getAllNotes,
   searchNotes,
+  searchVersions,
   updateNote,
   deleteNote,
   getVersionHistory,

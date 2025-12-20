@@ -50,10 +50,77 @@ export const findVersionByNumber = async (prisma: PrismaClient | Prisma.Transact
   }
 };
 
+export const searchVersions = async (
+  prisma: PrismaClient | Prisma.TransactionClient,
+  userId: number,
+  searchQuery: string,
+  skip: number,
+  limit: number
+) => {
+  try {
+    const [versions, total] = await Promise.all([
+      prisma.note_version.findMany({
+        where: {
+          createdBy: userId,
+          OR: [
+            {
+              title: {
+                contains: searchQuery,
+              },
+            },
+            {
+              content: {
+                contains: searchQuery,
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          noteId: true,
+          title: true,
+          versionNumber: true,
+          createdAt: true,
+          createdBy: true,
+          changeDescription: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.note_version.count({
+        where: {
+          createdBy: userId,
+          OR: [
+            {
+              title: {
+                contains: searchQuery,
+              },
+            },
+            {
+              content: {
+                contains: searchQuery,
+              },
+            },
+          ],
+        },
+      }),
+    ]);
+
+    return { versions, total };
+  } catch (error) {
+    debugLog("Error searching versions:", error);
+    throw error;
+  }
+};
+
 const noteVersionDao = {
   createNoteVersion,
   findVersionsByNoteId,
   findVersionByNumber,
+  searchVersions,
 };
 
 export default noteVersionDao;
