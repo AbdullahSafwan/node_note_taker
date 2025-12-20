@@ -40,6 +40,14 @@ const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClien
           userId,
           isDeleted: false,
         },
+        select: {
+          id: true,
+          title: true,
+          version: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true,
+        },
         orderBy: {
           updatedAt: "desc",
         },
@@ -86,6 +94,14 @@ const searchNotes = async (
               },
             },
           ],
+        },
+        select: {
+          id: true,
+          title: true,
+          version: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true,
         },
         orderBy: {
           updatedAt: "desc",
