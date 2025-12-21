@@ -1,5 +1,5 @@
 import { prisma } from "../config/database";
-import { share_permission } from "../../generated/prisma/client";
+import { share_permission } from "@prisma/client";
 
 export const canReadNote = async (
   noteId: string,

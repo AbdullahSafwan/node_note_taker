@@ -1,5 +1,5 @@
 import { body, param, query } from "express-validator";
-import { share_permission } from "../../generated/prisma/client";
+import { share_permission } from "@prisma/client";
 
 export const shareNoteValidation = [
   param("noteId").isUUID().withMessage("Invalid note ID"),

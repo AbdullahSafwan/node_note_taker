@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "../../generated/prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { CreateNoteData, UpdateNoteData } from "../types/notesTypes";
 import { debugLog } from "../utils/helper";
 

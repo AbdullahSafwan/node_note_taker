@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "../../generated/prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { debugLog } from "../utils/helper";
 
 const findFirstShare = async (prisma: PrismaClient | Prisma.TransactionClient, noteId: string, sharedWith: number) => {

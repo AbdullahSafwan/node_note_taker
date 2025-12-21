@@ -1,4 +1,4 @@
-import { note, note_version } from "../../generated/prisma/client";
+import { note, note_version } from "@prisma/client";
 
 // req types
 export interface CreateNoteRequest {

@@ -1,4 +1,4 @@
-import { share_permission } from "../../generated/prisma/client";
+import { share_permission } from "@prisma/client";
 
 
 export type CreateShareRequest = {
