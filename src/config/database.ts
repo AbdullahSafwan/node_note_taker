@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { PrismaClient } from "@prisma/client";
 import { debugLog } from '../utils/helper';
+import { env } from "./env";
 
 
 const globalForPrisma = globalThis as unknown as {
@@ -15,6 +16,7 @@ const createAdapter = () => {
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
+    port: env.NODE_ENV==='production' ? Number(process.env.DATABASE_PORT) : Number(process.env.MYSQL_HOST_PORT),
     connectionLimit: 10, // Maximum number of connections in pool
     allowPublicKeyRetrieval: true,
     connectTimeout: 30000,
