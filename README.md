@@ -12,7 +12,7 @@ A modern note-taking application built with Node.js, TypeScript, Express, Redis,
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AbdullahSafwan/node_note_taker.git
 cd node_note_taker
 ```
 
