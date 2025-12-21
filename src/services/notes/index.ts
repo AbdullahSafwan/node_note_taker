@@ -3,7 +3,8 @@ import noteDao from "../../dao/note";
 import noteVersionDao from "../../dao/noteVersion";
 import { NotFoundError, ConflictError } from "../../utils/customErrors";
 import { debugLog } from "../../utils/helper";
-import { CreateNoteRequest, UpdateNoteRequest, RevertNoteRequest } from "../../types/notesTypes";
+import { CreateNoteRequest, UpdateNoteRequest, RevertNoteRequest, NoteResponse } from "../../types/notesTypes";
+import { getCache, setCache, CACHE_KEYS, CACHE_TTL, invalidateNoteCache, invalidateUserNotesCache } from "../../utils/redisHelper";
 
 export const createNote = async (userId: number, data: CreateNoteRequest) => {
   try {
@@ -12,6 +13,9 @@ export const createNote = async (userId: number, data: CreateNoteRequest) => {
       content: data.content,
       userId,
     });
+
+    //invalidate user notes list cache
+    await invalidateUserNotesCache(userId);
 
     return note;
   } catch (error) {
@@ -22,12 +26,23 @@ export const createNote = async (userId: number, data: CreateNoteRequest) => {
 
 export const getNoteById = async (noteId: string, userId: number) => {
   try {
+    //try cache first
+    const cacheKey = CACHE_KEYS.NOTE(noteId);
+    const cachedNote = await getCache<NoteResponse>(cacheKey);
+    if (cachedNote) {
+      debugLog(`Cache hit for note: ${noteId}`);
+      return cachedNote;
+    }
+
+    //fetch from db if cache miss
     const note = await noteDao.findNoteById(prisma, noteId, userId);
 
     if (!note) {
       throw new NotFoundError("Note not found");
     }
 
+    //store cache
+    await setCache(cacheKey, note, CACHE_TTL.NOTE);
     return note;
   } catch (error) {
     debugLog("Error in getNoteById service:", error);
@@ -37,10 +52,21 @@ export const getNoteById = async (noteId: string, userId: number) => {
 
 export const getAllNotes = async (userId: number, page: number = 1, limit: number = 20) => {
   try {
-    const skip = (page - 1) * limit;
-    const { notes, total } = await noteDao.findAllNotesByUser(prisma, userId, skip, limit);
+    //try cache first
+    const cacheKey = CACHE_KEYS.USER_NOTES(userId, page, limit);
+    const cachedData = await getCache<{ notes: NoteResponse[]; pagination: any }>(cacheKey);
+    if (cachedData) {
+      debugLog(`Cache hit for user notes: ${userId}, page: ${page}, limit: ${limit}`);
+      return cachedData;
+    }
 
-    const totalPages = Math.ceil(total / limit);
+    //fetch from db if cache miss
+
+    const skip = (page - 1) * limit;
+    const { notes, total, totalPages } = await noteDao.findAllNotesByUser(prisma, userId, skip, limit);
+
+    //store cache
+    await setCache(cacheKey, { notes, pagination: { total, page, limit, totalPages } }, CACHE_TTL.NOTE_LIST);
 
     return {
       notes,
@@ -59,10 +85,19 @@ export const getAllNotes = async (userId: number, page: number = 1, limit: numbe
 
 export const searchNotes = async (userId: number, searchQuery: string, page: number = 1, limit: number = 20) => {
   try {
+    // try cache first
+    const cacheKey = CACHE_KEYS.SEARCH_NOTES(userId, searchQuery, page, limit);
+    const cachedData = await getCache<{ notes: NoteResponse[]; pagination: any }>(cacheKey);
+    if (cachedData) {
+      debugLog(`Cache hit for search notes: ${userId}, query: ${searchQuery}, page: ${page}, limit: ${limit}`);
+      return cachedData;
+    }
+    // fetch from db if cache miss
     const skip = (page - 1) * limit;
-    const { notes, total } = await noteDao.searchNotes(prisma, userId, searchQuery, skip, limit);
+    const { notes, total, totalPages } = await noteDao.searchNotes(prisma, userId, searchQuery, skip, limit);
 
-    const totalPages = Math.ceil(total / limit);
+    // store cache
+    await setCache(cacheKey, { notes, pagination: { total, page, limit, totalPages, searchQuery } }, CACHE_TTL.SEARCH_RESULTS);
 
     return {
       notes,
@@ -83,14 +118,14 @@ export const searchNotes = async (userId: number, searchQuery: string, page: num
 export const updateNote = async (noteId: string, userId: number, expectedVersion: number, data: UpdateNoteRequest) => {
   try {
     return await prisma.$transaction(async (tx) => {
-      // 1. Fetch current note
+      //fetch existing note
       const note = await noteDao.findNoteById(tx, noteId, userId);
 
       if (!note) {
         throw new NotFoundError("Note not found");
       }
 
-      // 2. Check version match early
+      // check version match early
       if (note.version !== expectedVersion) {
         throw new ConflictError("Note was modified by another user", {
           expected: expectedVersion,
@@ -98,7 +133,7 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
         });
       }
 
-      // 3. Create version snapshot BEFORE update
+      // create version snapshot BEFORE update
       await noteVersionDao.createNoteVersion(tx, {
         noteId,
         title: note.title,
@@ -107,10 +142,10 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
         createdBy: userId,
       });
 
-      // 4. Perform optimistic locking update
+      // perform optimistic locking update
       const updateResult = await noteDao.updateNote(tx, noteId, userId, expectedVersion, data);
 
-      // 5. Verify update succeeded
+      // verify update succeeded
       if (updateResult.count === 0) {
         throw new ConflictError("Version mismatch during update", {
           expected: expectedVersion,
@@ -118,8 +153,9 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
         });
       }
 
-      // 6. Return updated note
+      // invalidate cache and return updated note
       const updatedNote = await noteDao.findNoteById(tx, noteId, userId);
+      await invalidateNoteCache(noteId, userId);
       return updatedNote;
     });
   } catch (error) {
@@ -135,6 +171,9 @@ export const deleteNote = async (noteId: string, userId: number) => {
     if (result.count === 0) {
       throw new NotFoundError("Note not found or already deleted");
     }
+
+    //invalidate cache
+    await invalidateNoteCache(noteId, userId);
 
     return { success: true };
   } catch (error) {
@@ -165,9 +204,7 @@ export const getVersionHistory = async (noteId: string, userId: number) => {
 export const searchVersions = async (userId: number, searchQuery: string, page: number = 1, limit: number = 20) => {
   try {
     const skip = (page - 1) * limit;
-    const { versions, total } = await noteVersionDao.searchVersions(prisma, userId, searchQuery, skip, limit);
-
-    const totalPages = Math.ceil(total / limit);
+    const { versions, total, totalPages } = await noteVersionDao.searchVersions(prisma, userId, searchQuery, skip, limit);
 
     return {
       versions,
@@ -188,14 +225,14 @@ export const searchVersions = async (userId: number, searchQuery: string, page: 
 export const revertToVersion = async (noteId: string, userId: number, expectedVersion: number, data: RevertNoteRequest) => {
   try {
     return await prisma.$transaction(async (tx) => {
-      // 1. Verify note exists and belongs to user
+      // 1 verify note exists and belongs to user
       const note = await noteDao.findNoteById(tx, noteId, userId);
 
       if (!note) {
         throw new NotFoundError("Note not found");
       }
 
-      // 2. Check version match
+      // 2 check version match
       if (note.version !== expectedVersion) {
         throw new ConflictError("Note was modified by another user", {
           expected: expectedVersion,
@@ -203,14 +240,14 @@ export const revertToVersion = async (noteId: string, userId: number, expectedVe
         });
       }
 
-      // 3. Find the target version to revert to
+      // 3 find the target version to revert to
       const targetVersion = await noteVersionDao.findVersionByNumber(tx, noteId, data.versionNumber);
 
       if (!targetVersion) {
         throw new NotFoundError(`Version ${data.versionNumber} not found for this note`);
       }
 
-      // 4. Create version snapshot of CURRENT state before reverting
+      // 4 create version snapshot of CURRENT state before reverting
       await noteVersionDao.createNoteVersion(tx, {
         noteId,
         title: note.title,
@@ -220,10 +257,10 @@ export const revertToVersion = async (noteId: string, userId: number, expectedVe
         changeDescription: data.changeDescription || `Reverted to version ${data.versionNumber}`,
       });
 
-      // 5. Revert note to target version content
+      // 5 revert note to target version content
       const revertResult = await noteDao.revertNoteToVersion(tx, noteId, userId, expectedVersion, targetVersion.title, targetVersion.content);
 
-      // 6. Verify revert succeeded
+      // 6 verify revert succeeded
       if (revertResult.count === 0) {
         throw new ConflictError("Version mismatch during revert", {
           expected: expectedVersion,
@@ -231,8 +268,9 @@ export const revertToVersion = async (noteId: string, userId: number, expectedVe
         });
       }
 
-      // 7. Return reverted note
+      // 7 invalidate cache and return reverted note
       const revertedNote = await noteDao.findNoteById(tx, noteId, userId);
+      await invalidateNoteCache(noteId, userId);
       return revertedNote;
     });
   } catch (error) {

@@ -61,20 +61,16 @@ const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClien
       }),
     ]);
 
-    return { notes, total };
+    const totalPages = Math.ceil(total / limit);
+
+    return { notes, total, totalPages };
   } catch (error) {
     debugLog("Error finding notes by user:", error);
     throw error;
   }
 };
 
-const searchNotes = async (
-  prisma: PrismaClient | Prisma.TransactionClient,
-  userId: number,
-  searchQuery: string,
-  skip: number,
-  limit: number
-) => {
+const searchNotes = async (prisma: PrismaClient | Prisma.TransactionClient, userId: number, searchQuery: string, skip: number, limit: number) => {
   try {
     const whereClause = {
       userId,
@@ -115,7 +111,9 @@ const searchNotes = async (
       }),
     ]);
 
-    return { notes, total };
+    const totalPages = Math.ceil(total / limit);
+
+    return { notes, total, totalPages };
   } catch (error) {
     debugLog("Error searching notes:", error);
     throw error;

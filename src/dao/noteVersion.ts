@@ -58,23 +58,25 @@ export const searchVersions = async (
   limit: number
 ) => {
   try {
+    const whereClause = {
+      createdBy: userId,
+      OR: [
+        {
+          title: {
+            contains: searchQuery,
+          },
+        },
+        {
+          content: {
+            contains: searchQuery,
+          },
+        },
+      ],
+    };
+
     const [versions, total] = await Promise.all([
       prisma.note_version.findMany({
-        where: {
-          createdBy: userId,
-          OR: [
-            {
-              title: {
-                contains: searchQuery,
-              },
-            },
-            {
-              content: {
-                contains: searchQuery,
-              },
-            },
-          ],
-        },
+        where: whereClause,
         select: {
           id: true,
           noteId: true,
@@ -91,25 +93,13 @@ export const searchVersions = async (
         take: limit,
       }),
       prisma.note_version.count({
-        where: {
-          createdBy: userId,
-          OR: [
-            {
-              title: {
-                contains: searchQuery,
-              },
-            },
-            {
-              content: {
-                contains: searchQuery,
-              },
-            },
-          ],
-        },
+        where: whereClause,
       }),
     ]);
 
-    return { versions, total };
+    const totalPages = Math.ceil(total / limit);
+
+    return { versions, total, totalPages };
   } catch (error) {
     debugLog("Error searching versions:", error);
     throw error;
