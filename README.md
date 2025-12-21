@@ -2,6 +2,15 @@
 
 A modern note-taking application built with Node.js, TypeScript, Express, Redis, and MySQL.
 
+## Documentation
+
+- 📘 [Technical Analysis](./TECHNICAL_ANALYSIS.md)
+
+This document explains the architectural decisions, implementation approach,
+and trade-offs made during development.
+
+---
+
 ## Production Deployment
 
 ### Prerequisites
