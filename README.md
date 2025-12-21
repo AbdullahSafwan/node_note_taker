@@ -27,22 +27,31 @@ openssl rand -base64 32
 Create a `.env` file in the root directory:
 
 ```env
-PORT=8080
+PORT=8080                 # Node.js app port
 NODE_ENV=production
 
+# MySQL Configuration
 DATABASE_USER=notetaker
 DATABASE_PASSWORD=notetakerpass
 DATABASE_NAME=note_taker_db
-DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
 DATABASE_HOST=mysql
 DATABASE_PORT=3306
+DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
+MYSQL_ROOT_PASSWORD=super-strong-root-password
+
+# host port for accessing mysql and redis (change these if host ports are already occupied)
+MYSQL_HOST_PORT=3307       # Host port for MySQL container
+REDIS_HOST_PORT=6380       # Host port for Redis container
 
 REDIS_URL=redis://redis:6379
 
+# JWT Secrets (use strong, randomly generated values)
 JWT_ACCESS_KEY_SECRET=jwt-access-secret
 JWT_REFRESH_KEY_SECRET=jwt-refresh-secret
 
+# CORS
 CORS_ORIGIN=*
+
 ```
 
 ### 3. Build & Deploy
@@ -116,22 +125,30 @@ openssl rand -base64 32
 Create a `.env` file:
 
 ```env
-PORT=3000
+PORT=8080                 # Node.js app port
 NODE_ENV=development
 
+# MySQL Configuration
 DATABASE_USER=notetaker
 DATABASE_PASSWORD=notetakerpass
 DATABASE_NAME=note_taker_db
-DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
 DATABASE_HOST=mysql
 DATABASE_PORT=3306
+DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
+MYSQL_ROOT_PASSWORD=super-strong-root-password
+MYSQL_HOST_PORT=3306       # Host port for MySQL container
 
+# Redis Configuration
 REDIS_URL=redis://redis:6379
+REDIS_HOST_PORT=6379       # Host port for Redis container
 
+# JWT Secrets (use strong, randomly generated values)
 JWT_ACCESS_KEY_SECRET=jwt-access-secret
 JWT_REFRESH_KEY_SECRET=jwt-refresh-secret
 
+# CORS
 CORS_ORIGIN=*
+
 
 
 ```
