@@ -4,9 +4,10 @@ import { prisma } from '../../config/database';
 import { SignUpRequest, LogInRequest, RefreshTokenRequest, CustomJwtPayload, AuthTokens } from '../../types/authTypes';
 import { userDao } from '../../dao/user';
 import { userSessionDao } from '../../dao/userSession';
+import { env } from '../../config/env';
 
-const JWT_ACCESS_KEY_SECRET = process.env.JWT_ACCESS_KEY_SECRET!;
-const JWT_REFRESH_KEY_SECRET = process.env.JWT_REFRESH_KEY_SECRET!;
+const JWT_ACCESS_KEY_SECRET = env.JWT_SECRET!;
+const JWT_REFRESH_KEY_SECRET = env.JWT_REFRESH_SECRET!;
 
 
 const generateAccessToken = (jwtPayload: CustomJwtPayload): string => {

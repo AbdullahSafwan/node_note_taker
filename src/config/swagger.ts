@@ -1,5 +1,5 @@
 import { postmanSwagger } from './postmanSwagger';
-
+import { env } from './env';
 const swaggerSpec = {
   openapi: '3.0.0',
   info: {
@@ -12,11 +12,11 @@ const swaggerSpec = {
   },
   servers: [
     {
-      url: 'http://localhost:8080',
+      url: `http://localhost:${env.PORT}`,
       description: 'Development server',
     },
     {
-      url: 'https://api.production.com',
+      url: process.env.PROD_SERVER_URL || 'https://api.production.com',
       description: 'Production server',
     },
   ],
@@ -44,6 +44,10 @@ const swaggerSpec = {
     {
       name: 'Notes',
       description: 'Notes management with version control and optimistic locking',
+    },
+    {
+      name: 'NotesSharing',
+      description: 'Note share and read/edit shared notes',
     },
   ],
 };
