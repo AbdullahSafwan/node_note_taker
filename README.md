@@ -70,9 +70,9 @@ docker compose up -d
 ```
 
 This starts:
-- MySQL database (port 3306)
-- Redis cache (port 6379)
-- Node.js application (port 3000)
+- MySQL database (host port 3307)
+- Redis cache (host port 6380)
+- Node.js application (port 8080)
 
 ### 4. Verify Deployment
 
@@ -84,7 +84,7 @@ docker compose ps
 docker compose logs -f app
 
 # Test API health
-curl http://localhost:3000/health
+curl http://localhost:8080/health
 ```
 
 ### Production Checklist
@@ -183,7 +183,7 @@ npx prisma generate
 npm run dev
 ```
 
-The API will be available at `http://localhost:8080`
+The API will be available at `http://localhost:8081`
 
 ## Available Scripts
 
