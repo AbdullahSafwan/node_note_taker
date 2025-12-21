@@ -137,7 +137,6 @@ const searchNotes = async (prisma: PrismaClient | Prisma.TransactionClient, user
 const updateNote = async (
   prisma: PrismaClient | Prisma.TransactionClient,
   noteId: string,
-  userId: number,
   expectedVersion: number,
   data: UpdateNoteData
 ) => {
@@ -145,7 +144,6 @@ const updateNote = async (
     const updateResult = await prisma.note.updateMany({
       where: {
         id: noteId,
-        userId,
         version: expectedVersion,
         isDeleted: false,
       },

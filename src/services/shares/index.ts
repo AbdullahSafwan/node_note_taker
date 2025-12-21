@@ -158,6 +158,8 @@ export const updatePermission = async (shareId: string, userId: number, data: Up
 
     const updated = await noteShareDao.updateShare(prisma, shareId, {
       permission: data.permission,
+      isRevoked: false,
+      revokedAt: null,
     });
 
     return {

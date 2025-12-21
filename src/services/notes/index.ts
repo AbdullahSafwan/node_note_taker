@@ -42,7 +42,7 @@ export const getNoteById = async (noteId: string, userId: number) => {
     }
 
     //fetch from db if cache miss
-    const note = await noteDao.findNoteByIdAndUserId(prisma, noteId, userId);
+    const note = await noteDao.findNoteById(prisma, noteId);
 
     if (!note) {
       throw new NotFoundError("Note not found");
@@ -132,7 +132,7 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
 
     return await prisma.$transaction(async (tx) => {
       //fetch existing note
-      const note = await noteDao.findNoteByIdAndUserId(tx, noteId, userId);
+      const note = await noteDao.findNoteById(tx, noteId);
 
       if (!note) {
         throw new NotFoundError("Note not found");
@@ -156,7 +156,7 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
       });
 
       // perform optimistic locking update
-      const updateResult = await noteDao.updateNote(tx, noteId, userId, expectedVersion, data);
+      const updateResult = await noteDao.updateNote(tx, noteId, expectedVersion, data);
 
       // verify update succeeded
       if (updateResult.count === 0) {
@@ -167,7 +167,7 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
       }
 
       // invalidate cache and return updated note
-      const updatedNote = await noteDao.findNoteByIdAndUserId(tx, noteId, userId);
+      const updatedNote = await noteDao.findNoteById(tx, noteId);
       await invalidateNoteCache(noteId, userId);
       return updatedNote;
     });
