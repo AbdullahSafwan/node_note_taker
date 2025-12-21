@@ -17,7 +17,7 @@ const createNote = async (prisma: PrismaClient | Prisma.TransactionClient, data:
   }
 };
 
-const findNoteById = async (prisma: PrismaClient | Prisma.TransactionClient, noteId: string, userId: number) => {
+const findNoteByIdAndUserId = async (prisma: PrismaClient | Prisma.TransactionClient, noteId: string, userId: number) => {
   try {
     return await prisma.note.findFirst({
       where: {
@@ -31,6 +31,20 @@ const findNoteById = async (prisma: PrismaClient | Prisma.TransactionClient, not
     throw error;
   }
 };
+
+const findNoteById = async (prisma: PrismaClient | Prisma.TransactionClient, noteId: string) => {
+  try {
+    return await prisma.note.findFirst({
+      where: {
+        id: noteId,
+        isDeleted: false,
+      },
+    });
+  } catch (error) {
+    debugLog("Error finding note by ID:", error);
+    throw error;
+  }
+}
 
 const findAllNotesByUser = async (prisma: PrismaClient | Prisma.TransactionClient, userId: number, skip: number, limit: number) => {
   try {
@@ -204,12 +218,13 @@ const revertNoteToVersion = async (
 
 const noteDao = {
   createNote,
-  findNoteById,
+  findNoteByIdAndUserId,
   findAllNotesByUser,
   searchNotes,
   updateNote,
   softDeleteNote,
   revertNoteToVersion,
+  findNoteById,
 };
 
 export default noteDao;

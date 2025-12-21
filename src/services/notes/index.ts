@@ -5,6 +5,7 @@ import { NotFoundError, ConflictError } from "../../utils/customErrors";
 import { debugLog } from "../../utils/helper";
 import { CreateNoteRequest, UpdateNoteRequest, RevertNoteRequest, NoteResponse } from "../../types/notesTypes";
 import { getCache, setCache, CACHE_KEYS, CACHE_TTL, invalidateNoteCache, invalidateUserNotesCache } from "../../utils/redisHelper";
+import { canReadNote, canEditNote, isNoteOwner } from "../../utils/noteAccessHelper";
 
 export const createNote = async (userId: number, data: CreateNoteRequest) => {
   try {
@@ -26,6 +27,12 @@ export const createNote = async (userId: number, data: CreateNoteRequest) => {
 
 export const getNoteById = async (noteId: string, userId: number) => {
   try {
+    // Check if user can read this note
+    const hasAccess = await canReadNote(noteId, userId);
+    if (!hasAccess) {
+      throw new NotFoundError("Note not found");
+    }
+
     //try cache first
     const cacheKey = CACHE_KEYS.NOTE(noteId);
     const cachedNote = await getCache<NoteResponse>(cacheKey);
@@ -35,7 +42,7 @@ export const getNoteById = async (noteId: string, userId: number) => {
     }
 
     //fetch from db if cache miss
-    const note = await noteDao.findNoteById(prisma, noteId, userId);
+    const note = await noteDao.findNoteByIdAndUserId(prisma, noteId, userId);
 
     if (!note) {
       throw new NotFoundError("Note not found");
@@ -117,9 +124,15 @@ export const searchNotes = async (userId: number, searchQuery: string, page: num
 
 export const updateNote = async (noteId: string, userId: number, expectedVersion: number, data: UpdateNoteRequest) => {
   try {
+    // Check if user can edit this note
+    const canEdit = await canEditNote(noteId, userId);
+    if (!canEdit) {
+      throw new NotFoundError("Note not found or you don't have edit permission");
+    }
+
     return await prisma.$transaction(async (tx) => {
       //fetch existing note
-      const note = await noteDao.findNoteById(tx, noteId, userId);
+      const note = await noteDao.findNoteByIdAndUserId(tx, noteId, userId);
 
       if (!note) {
         throw new NotFoundError("Note not found");
@@ -154,7 +167,7 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
       }
 
       // invalidate cache and return updated note
-      const updatedNote = await noteDao.findNoteById(tx, noteId, userId);
+      const updatedNote = await noteDao.findNoteByIdAndUserId(tx, noteId, userId);
       await invalidateNoteCache(noteId, userId);
       return updatedNote;
     });
@@ -166,6 +179,12 @@ export const updateNote = async (noteId: string, userId: number, expectedVersion
 
 export const deleteNote = async (noteId: string, userId: number) => {
   try {
+    // Only owner can delete
+    const isOwner = await isNoteOwner(noteId, userId);
+    if (!isOwner) {
+      throw new NotFoundError("Note not found or you don't have permission to delete");
+    }
+
     const result = await noteDao.softDeleteNote(prisma, noteId, userId);
 
     if (result.count === 0) {
@@ -184,10 +203,9 @@ export const deleteNote = async (noteId: string, userId: number) => {
 
 export const getVersionHistory = async (noteId: string, userId: number) => {
   try {
-    // Verify note exists and belongs to user
-    const note = await noteDao.findNoteById(prisma, noteId, userId);
-
-    if (!note) {
+    // Check if user can read this note
+    const hasAccess = await canReadNote(noteId, userId);
+    if (!hasAccess) {
       throw new NotFoundError("Note not found");
     }
 
@@ -224,9 +242,15 @@ export const searchVersions = async (userId: number, searchQuery: string, page: 
 
 export const revertToVersion = async (noteId: string, userId: number, expectedVersion: number, data: RevertNoteRequest) => {
   try {
+    // Check if user can edit this note
+    const canEdit = await canEditNote(noteId, userId);
+    if (!canEdit) {
+      throw new NotFoundError("Note not found or you don't have edit permission");
+    }
+
     return await prisma.$transaction(async (tx) => {
-      // 1 verify note exists and belongs to user
-      const note = await noteDao.findNoteById(tx, noteId, userId);
+      // 1 fetch note (user has access, might be owner or shared)
+      const note = await noteDao.findNoteById(tx, noteId);
 
       if (!note) {
         throw new NotFoundError("Note not found");
@@ -265,11 +289,11 @@ export const revertToVersion = async (noteId: string, userId: number, expectedVe
         throw new ConflictError("Version mismatch during revert", {
           expected: expectedVersion,
           current: note.version,
-        });
+      });
       }
 
       // 7 invalidate cache and return reverted note
-      const revertedNote = await noteDao.findNoteById(tx, noteId, userId);
+      const revertedNote = await noteDao.findNoteById(tx, noteId);
       await invalidateNoteCache(noteId, userId);
       return revertedNote;
     });

@@ -8,17 +8,19 @@ datasource db {
 }
 
 model user {
-  id                        Int                       @unique @default(autoincrement())
-  firstName                 String
-  lastName                  String
-  phoneNumber               String
-  email                     String                    @unique
-  password                  String
-  createdAt                 DateTime                  @default(now())
-  modifiedAt                DateTime                  @default(now()) @updatedAt
-  status                    user_status               @default(ENABLED)
-  user_sessions             user_session[]
-  notes                     note[]
+  id            Int            @unique @default(autoincrement())
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  modifiedAt    DateTime       @default(now()) @updatedAt
+  status        user_status    @default(ENABLED)
+  user_sessions user_session[]
+  notes         note[]         @relation("OwnedNotes")
+  sharedByMe    note_share[]   @relation("SharedByUser")
+  sharedWithMe  note_share[]   @relation("SharedWithUser")
 }
 
 model user_session {
@@ -34,6 +36,11 @@ enum user_status {
   DISABLED
 }
 
+enum share_permission {
+  READ
+  EDIT
+}
+
 model note {
   id        String         @id @default(uuid())
   title     String         @db.VarChar(255)
@@ -42,10 +49,11 @@ model note {
   isDeleted Boolean        @default(false)
   deletedAt DateTime?
   userId    Int
-  user      user           @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user      user           @relation("OwnedNotes", fields: [userId], references: [id], onDelete: Restrict)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   versions  note_version[]
+  shares    note_share[]
 
   @@index([userId])
   @@index([isDeleted])
@@ -67,4 +75,23 @@ model note_version {
   @@index([noteId])
   @@index([noteId, versionNumber])
   @@index([createdAt])
+}
+
+model note_share {
+  id           String           @id @default(uuid())
+  noteId       String
+  sharedBy     Int
+  sharedWith   Int
+  permission   share_permission @default(READ)
+  isRevoked    Boolean          @default(false)
+  revokedAt    DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  note         note             @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  owner        user             @relation("SharedByUser", fields: [sharedBy], references: [id])
+  collaborator user             @relation("SharedWithUser", fields: [sharedWith], references: [id])
+
+  @@unique([noteId, sharedWith])
+  @@index([noteId, isRevoked])
+  @@index([sharedWith, isRevoked])
 }
