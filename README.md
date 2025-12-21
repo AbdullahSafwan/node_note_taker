@@ -1,135 +1,201 @@
-# node_note_taker
-note taking app built using node.js, ts, express, redis, mysql
+# Note Taker
 
-## Docker Setup
+A modern note-taking application built with Node.js, TypeScript, Express, Redis, and MySQL.
 
-This project includes Docker and Docker Compose configuration for easy deployment and development.
+## Production Deployment
 
 ### Prerequisites
 
 - Docker Engine 20.10+
 - Docker Compose 2.0+
 
-### Quick Start
+### 1. Clone Repository
 
-1. **Create a `.env` file** in the root directory with the following variables:
-
-```env
-NODE_ENV=production
-PORT=3000
-DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker
-REDIS_URL=redis://redis:6379
-JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
-JWT_EXPIRES_IN=24h
-
-# MySQL Configuration
-MYSQL_ROOT_PASSWORD=rootpassword
-MYSQL_DATABASE=note_taker
-MYSQL_USER=notetaker
-MYSQL_PASSWORD=notetakerpass
-MYSQL_PORT=3306
-
-# Redis Configuration
-REDIS_PORT=6379
+```bash
+git clone <repository-url>
+cd node_note_taker
 ```
 
-**Important:** Replace `JWT_SECRET` with a secure random string (at least 32 characters). You can generate one using:
+### 2. Environment Configuration
+
+
+**Generate a secure JWT secret:**
 ```bash
 openssl rand -base64 32
 ```
 
-2. **Build and start all services:**
+Create a `.env` file in the root directory:
+
+```env
+PORT=8080
+NODE_ENV=production
+
+DATABASE_USER=notetaker
+DATABASE_PASSWORD=notetakerpass
+DATABASE_NAME=note_taker_db
+DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
+DATABASE_HOST=mysql
+DATABASE_PORT=3306
+
+REDIS_URL=redis://redis:6379
+
+JWT_ACCESS_KEY_SECRET=jwt-access-secret
+JWT_REFRESH_KEY_SECRET=jwt-refresh-secret
+
+CORS_ORIGIN=*
+```
+
+### 3. Build & Deploy
+
 ```bash
 docker-compose up -d
 ```
 
-This will start:
+This starts:
 - MySQL database (port 3306)
 - Redis cache (port 6379)
 - Node.js application (port 3000)
 
-3. **View logs:**
+### 4. Verify Deployment
+
 ```bash
+# Check running services
+docker-compose ps
+
+# View application logs
 docker-compose logs -f app
+
+# Test API health
+curl http://localhost:3000/health
 ```
 
-4. **Stop all services:**
+### Production Checklist
+
+- Use strong, randomly generated `JWT_SECRET`
+- Change all default database passwords
+- Configure CORS origins for frontend domain
+- Set up proper backup strategy for MySQL volumes
+- Monitor logs and application metrics
+- Keep Docker images updated
+
+
+### 5. Stop all services
 ```bash
 docker-compose down
 ```
 
-5. **Stop and remove volumes (clean slate):**
+### 6. Stop and remove all volumes
 ```bash
 docker-compose down -v
 ```
+---
 
-### Development Setup
+## Development Setup
 
-For development, you can run only the database services with Docker and run the app locally:
+### Prerequisites
 
-1. **Start only MySQL and Redis:**
+- Node.js 18+
+- Docker & Docker Compose
+- npm or yarn
+
+### 1. Clone & Install
+
+```bash
+git clone <repository-url>
+cd node_note_taker
+npm install
+```
+
+### 2. Local Environment
+
+**Generate a secure JWT secret:**
+```bash
+openssl rand -base64 32
+```
+
+Create a `.env` file:
+
+```env
+PORT=3000
+NODE_ENV=development
+
+DATABASE_USER=notetaker
+DATABASE_PASSWORD=notetakerpass
+DATABASE_NAME=note_taker_db
+DATABASE_URL=mysql://notetaker:notetakerpass@mysql:3306/note_taker_db
+DATABASE_HOST=mysql
+DATABASE_PORT=3306
+
+REDIS_URL=redis://redis:6379
+
+JWT_ACCESS_KEY_SECRET=jwt-access-secret
+JWT_REFRESH_KEY_SECRET=jwt-refresh-secret
+
+CORS_ORIGIN=*
+
+
+```
+
+### 3. Start Services
+
+Run only database services with Docker:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
-2. **Update your local `.env` file** to use:
-```env
-DATABASE_URL=mysql://notetaker:notetakerpass@localhost:3306/note_taker
-REDIS_URL=redis://localhost:6379
+### 4. Initialize Database
+
+```bash
+npm run migrate
 ```
 
-3. **Run the application locally:**
+### 5. Run Development Server
+
 ```bash
-npm install
 npm run dev
+```
+
+The API will be available at `http://localhost:3000`
+
+## Available Scripts
+
+```bash
+npm run dev       # Start development server with hot reload
+npm run build     # Compile TypeScript to JavaScript
+npm run start     # Run compiled application
+npm run migrate   # Run Prisma migrations
+npm run test      # Run test suite
+npm run lint      # Run ESLint
+```
+
+## Useful Commands
+
+### Docker Operations
+
+```bash
+# Stop all services
+docker-compose down
+
+# Clean everything (volumes & containers)
+docker-compose down -v
+
+# View logs
+docker-compose logs -f app
+
+# Access MySQL CLI
+docker-compose exec mysql mysql -u notetaker -p note_taker
+
+# Access Redis CLI
+docker-compose exec redis redis-cli
 ```
 
 ### Database Migrations
 
-Database migrations run automatically when the container starts. If you need to run migrations manually:
-
 ```bash
+# Run migrations (production)
 docker-compose exec app npx prisma migrate deploy
-```
 
-Or for development:
-```bash
+# Create new migration (development)
 npx prisma migrate dev
 ```
-
-### Useful Commands
-
-- **Rebuild the application:**
-```bash
-docker-compose build app
-docker-compose up -d
-```
-
-- **Access MySQL CLI:**
-```bash
-docker-compose exec mysql mysql -u notetaker -p note_taker
-```
-
-- **Access Redis CLI:**
-```bash
-docker-compose exec redis redis-cli
-```
-
-- **View all running containers:**
-```bash
-docker-compose ps
-```
-
-- **Check application health:**
-```bash
-curl http://localhost:3000/health
-```
-
-### Production Considerations
-
-- Change all default passwords in production
-- Use strong, randomly generated `JWT_SECRET`
-- Configure proper CORS origins
-- Set up proper backup strategy for MySQL volumes
-- Consider using Docker secrets for sensitive data
-- Review and adjust resource limits in docker-compose.yml
