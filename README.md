@@ -84,9 +84,13 @@ docker compose ps
 docker compose logs -f app
 
 # Test API health
-curl http://localhost:8080/health
+curl http://localhost:8081/health
 ```
+### 5. Access swagger docs
 
+```
+http://localhost:8081/api-docs/
+```
 ### Production Checklist
 
 - Use strong, randomly generated `JWT_SECRET`
@@ -97,12 +101,12 @@ curl http://localhost:8080/health
 - Keep Docker images updated
 
 
-### 5. Stop all services
+### 6. Stop all services
 ```bash
 docker compose down
 ```
 
-### 6. Stop and remove all volumes
+### 7. Stop and remove all volumes
 ```bash
 docker compose down -v
 ```
