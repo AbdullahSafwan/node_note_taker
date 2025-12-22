@@ -5,7 +5,7 @@ export const postmanSwagger = {
   paths: {
     "/auth/signup": {
       post: {
-        tags: ["auth"],
+        tags: ["Authentication"],
         summary: "signup",
         requestBody: {
           content: {
@@ -164,7 +164,7 @@ export const postmanSwagger = {
     },
     "/auth/login": {
       post: {
-        tags: ["auth"],
+        tags: ["Authentication"],
         summary: "login",
         requestBody: {
           content: {
@@ -455,7 +455,7 @@ export const postmanSwagger = {
     },
     "/auth/refresh": {
       post: {
-        tags: ["auth"],
+        tags: ["Authentication"],
         summary: "refreshAccessToken",
         requestBody: {
           content: {
@@ -745,7 +745,7 @@ export const postmanSwagger = {
     },
     "/auth/logout": {
       delete: {
-        tags: ["auth"],
+        tags: ["Authentication"],
         summary: "logout",
         responses: {
           "200": {
@@ -887,7 +887,7 @@ export const postmanSwagger = {
     },
     "/notes/": {
       post: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "create note",
         requestBody: {
           content: {
@@ -1041,7 +1041,7 @@ export const postmanSwagger = {
         },
       },
       get: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "list notes",
         parameters: [
           {
@@ -1202,7 +1202,7 @@ export const postmanSwagger = {
     },
     "/notes/search/": {
       get: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "search notes",
         parameters: [
           {
@@ -1381,7 +1381,7 @@ export const postmanSwagger = {
     },
     "/notes/{noteId}/versions": {
       get: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "get note versions",
         parameters: [
           {
@@ -1534,7 +1534,7 @@ export const postmanSwagger = {
     },
     "/notes/{noteId}": {
       get: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "get note details",
         parameters: [
           {
@@ -1685,7 +1685,7 @@ export const postmanSwagger = {
         },
       },
       put: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "update note",
         requestBody: {
           content: {
@@ -1992,7 +1992,7 @@ export const postmanSwagger = {
         },
       },
       delete: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "delete note",
         parameters: [
           {
@@ -2152,7 +2152,7 @@ export const postmanSwagger = {
     },
     "/notes/{noteId}/revert": {
       post: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "revert note version",
         requestBody: {
           content: {
@@ -2326,7 +2326,7 @@ export const postmanSwagger = {
     },
     "/notes/search-versions": {
       get: {
-        tags: ["notes"],
+        tags: ["Notes"],
         summary: "search notes versions",
         parameters: [
           {
@@ -2495,7 +2495,7 @@ export const postmanSwagger = {
     },
     "/note-share/{noteId}/collaborators": {
       get: {
-        tags: ["note share"],
+        tags: ["NotesSharing"],
         summary: "get collaborators",
         parameters: [
           {
@@ -2783,7 +2783,7 @@ export const postmanSwagger = {
     },
     "/note-share/shared-with-me": {
       get: {
-        tags: ["note share"],
+        tags: ["NotesSharing"],
         summary: "notes shared with me",
         parameters: [
           {
@@ -2944,7 +2944,7 @@ export const postmanSwagger = {
     },
     "/note-share/{noteId}/share": {
       post: {
-        tags: ["note share"],
+        tags: ["NotesSharing"],
         summary: "share note with user",
         requestBody: {
           content: {
@@ -3110,7 +3110,7 @@ export const postmanSwagger = {
     },
     "/note-share/{noteId}/share/{shareId}": {
       put: {
-        tags: ["note share"],
+        tags: ["NotesSharing"],
         summary: "update permission",
         requestBody: {
           content: {
@@ -3416,7 +3416,7 @@ export const postmanSwagger = {
         },
       },
       delete: {
-        tags: ["note share"],
+        tags: ["NotesSharing"],
         summary: "revoke share access",
         parameters: [
           {
