@@ -27,8 +27,8 @@ cd node_note_taker
 
 ### 2. Environment Configuration
 
-
 **Generate a secure JWT secret:**
+
 ```bash
 openssl rand -base64 32
 ```
@@ -70,6 +70,7 @@ docker compose up -d
 ```
 
 This starts:
+
 - MySQL database (host port 3307)
 - Redis cache (host port 6380)
 - Node.js application (port 8080)
@@ -86,11 +87,20 @@ docker compose logs -f app
 # Test API health
 curl http://localhost:8081/health
 ```
+
 ### 5. Access swagger docs
 
 ```
 http://localhost:8081/api-docs/
 ```
+
+### Postman Collection
+
+Postman Collection is available under the `postman_collection` branch.
+
+- **Branch Name:** `postman_collection`
+- **Directory:** `./"Postman Collections"`
+
 ### Production Checklist
 
 - Use strong, randomly generated `JWT_SECRET`
@@ -100,16 +110,18 @@ http://localhost:8081/api-docs/
 - Monitor logs and application metrics
 - Keep Docker images updated
 
-
 ### 6. Stop all services
+
 ```bash
 docker compose down
 ```
 
 ### 7. Stop and remove all volumes
+
 ```bash
 docker compose down -v
 ```
+
 ---
 
 ## Development Setup
@@ -131,6 +143,7 @@ npm install
 ### 2. Local Environment
 
 **Generate a secure JWT secret:**
+
 ```bash
 openssl rand -base64 32
 ```
