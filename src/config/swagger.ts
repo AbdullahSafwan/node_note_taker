@@ -13,11 +13,11 @@ const swaggerSpec = {
   servers: [
     {
       url: `http://localhost:${env.PORT}`,
-      description: 'Development server',
+      description: 'Local server',
     },
     {
       url: process.env.PROD_SERVER_URL || 'https://api.production.com',
-      description: 'Production server',
+      description: 'Deployed server',
     },
   ],
   components: {
