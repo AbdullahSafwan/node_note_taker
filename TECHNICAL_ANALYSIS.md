@@ -184,6 +184,8 @@ performance, and maintainability within the scope of this assessment:
   complexity and setup time.
 - Used optimistic locking instead of database-level locks to support
   horizontal scalability at the cost of occasional client retries.
+- Kept a single branch for codebase to simplify development and deployment,
+  sacrificing advanced CI/CD workflows and merging strategies.
 - Implemented Redis caching with manual invalidation, increasing code
   complexity while significantly improving read performance.
 - Prioritized clean architecture and clarity over advanced features such as

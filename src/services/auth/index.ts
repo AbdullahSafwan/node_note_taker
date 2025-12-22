@@ -5,6 +5,7 @@ import { SignUpRequest, LogInRequest, RefreshTokenRequest, CustomJwtPayload, Aut
 import { userDao } from '../../dao/user';
 import { userSessionDao } from '../../dao/userSession';
 import { env } from '../../config/env';
+import { Prisma } from '@prisma/client';
 
 const JWT_ACCESS_KEY_SECRET = env.JWT_SECRET!;
 const JWT_REFRESH_KEY_SECRET = env.JWT_REFRESH_SECRET!;
@@ -155,6 +156,12 @@ const logOut = async (data: RefreshTokenRequest) => {
     return result;
   } catch (error) {
     console.error('Error in logOut:', error);
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2025'
+    ) {
+      throw new Error('Session not found or already logged out');
+    }
     throw error;
   }
 };

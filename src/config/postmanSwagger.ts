@@ -747,6 +747,18 @@ export const postmanSwagger = {
       delete: {
         tags: ["Authentication"],
         summary: "logout",
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  refreshToken: "{{refreshToken}}",
+                },
+              },
+            },
+          },
+        },
         responses: {
           "200": {
             description: "OK",

@@ -67,6 +67,9 @@ export const logOut = async (
 ) => {
   try {
     const data = req.body;
+    if (!data.refreshToken) {
+      throw new Error('Refresh token is required for logout');
+    }
     await authService.logOut(data);
 
     sendSuccessResponse(res, 200, 'Logout successful');
