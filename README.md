@@ -73,7 +73,7 @@ This starts:
 
 - MySQL database (host port 3307)
 - Redis cache (host port 6380)
-- Node.js application (port 8080)
+- Node.js application (port 8081)
 
 ### 4. Verify Deployment
 
@@ -136,7 +136,7 @@ docker compose down -v
 ### 1. Clone & Install
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AbdullahSafwan/node_note_taker.git
 cd node_note_taker
 npm install
 ```
