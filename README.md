@@ -201,7 +201,7 @@ npx prisma generate
 npm run dev
 ```
 
-The API will be available at `http://localhost:8081`
+The API will be available at `http://localhost:8080`
 
 ## Available Scripts
 
