@@ -43,22 +43,22 @@
 								},
 								{
 									"key": "lastName",
-									"value": null,
+									"value": "",
 									"disabled": true
 								},
 								{
 									"key": "phoneNumber",
-									"value": null,
+									"value": "",
 									"disabled": true
 								},
 								{
 									"key": "email",
-									"value": null,
+									"value": "",
 									"disabled": true
 								},
 								{
 									"key": "password",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]
@@ -464,7 +464,7 @@
 							],
 							"cookie": [],
 							"responseTime": null,
-							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5kb2VAbWFpbGRyb3AuY2MiLCJ1c2VySWQiOjIsImlhdCI6MTc2NjI0MDA1MiwiZXhwIjoxNzY2MjQzNjUyfQ.1tSSl1YpxWPWJcbDl4gM65erfZbCVnxBCWfMaBh1iC4\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5kb2VAbWFpbGRyb3AuY2MiLCJ1c2VySWQiOjIsImlhdCI6MTc2NjI0MDA1MiwiZXhwIjoxNzY2ODQ0ODUyfQ.dUcIbKRr1gAe_C4exafHZCTHcB1x9Dyv2BDis-mfptQ\"\n    },\n    \"message\": \"Login successful\",\n    \"error\": null\n}"
+							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"accessToken\": \"{{vault:json-web-token}}\",\n        \"refreshToken\": \"{{vault:json-web-token}}\"\n    },\n    \"message\": \"Login successful\",\n    \"error\": null\n}"
 						}
 					]
 				},
@@ -616,7 +616,7 @@
 							],
 							"cookie": [],
 							"responseTime": null,
-							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5kb2VAbWFpbGRyb3AuY2MiLCJ1c2VySWQiOjIsImlhdCI6MTc2NjI0MDA3MiwiZXhwIjoxNzY2MjQzNjcyfQ.sNYTw5HCCmAuahMP5msVTCGvafYw9UBAWa_FTLYlb3Q\"\n    },\n    \"message\": \"Token refreshed successfully\",\n    \"error\": null\n}"
+							"body": "{\n    \"success\": true,\n    \"data\": {\n        \"accessToken\": \"{{vault:json-web-token}}\"\n    },\n    \"message\": \"Token refreshed successfully\",\n    \"error\": null\n}"
 						},
 						{
 							"id": "652c3864-5736-4955-9b06-a46b9f925cbb",
