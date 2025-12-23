@@ -96,10 +96,11 @@ http://localhost:8081/api-docs/
 
 ### Postman Collection
 
-Postman Collection is available under the `postman_collection` branch.
+Postman Collection is available under the [`postman_collection`](https://github.com/AbdullahSafwan/node_note_taker/tree/postman_collection) branch. 
 
-- **Branch Name:** `postman_collection`
-- **Directory:** `./"Postman Collections"`
+- **Branch Name:** [`postman_collection`](https://github.com/AbdullahSafwan/node_note_taker/tree/postman_collection)
+- **Directory:** [`Postman Collections`](https://github.com/AbdullahSafwan/node_note_taker/tree/postman_collection/Postman%20Collections)
+
 
 ### Production Checklist
 
